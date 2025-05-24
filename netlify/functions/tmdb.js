@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+ const fetch = require('node-fetch');
 
 exports.handler = async function(event) {
   const API_KEY = 'd1becbefc947f6d6af137051548adf7f';  // Your TMDB API key
