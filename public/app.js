@@ -1,8 +1,33 @@
+// Firebase App (core)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-window.loadCategory = loadCategory;
 
-let username;
+// Firebase Auth
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  deleteDoc,
+  collection,
+  getDocs,
+  where,
+  orderBy,
+  query,
+  onSnapshot,
+  addDoc,
+  serverTimestamp,
+} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+
+
+let username = null;
+
+
+
 const firebaseConfig = {
     apiKey: "AIzaSyDTQ1a32pJVHsjkGulIhngAoWFiZttHq9g",
     authDomain: "flickstreembysk.firebaseapp.com",
@@ -13,9 +38,11 @@ const firebaseConfig = {
     measurementId: "G-DSKRQDFNR3"
   };
   
- // Initialize Firebase
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
+export { db };
 
 // DOM Elements
 const emailSingUp = document.getElementById("emailSingUp");
@@ -25,25 +52,34 @@ const passwordSingIn = document.getElementById("passwordSingIn");
 const message = document.getElementById("message");
 
 window.signUp = function () {
+  message.textContent = "Working please wait...";
+  const passkey = document.querySelector("#passkey");
+  if(passkey.value==='7714'){
   createUserWithEmailAndPassword(auth, emailSingUp.value, passwordSingUp.value)
     .then(userCredential => {
       message.textContent = "✅ Sign-up successful!";
       hideSlideBar();
       document.querySelector(".FirebaseContainer").style.display = "none";
-      alert("✅ Sign-up successful!");
+      document.querySelector(".main-container").style.display="block";
+
     })
     .catch(error => {
       message.textContent = `❌ ${error.message}`;
     });
+  }
+  else
+    message.textContent = `Wrong pass key `;
 };
 
 window.logIn = function () {
-  signInWithEmailAndPassword(auth, emailSingIn.value, passwordSingIn.value)
+  message.textContent = "Working please wait...";
+   signInWithEmailAndPassword(auth, emailSingIn.value, passwordSingIn.value)
     .then(userCredential => {
       message.textContent = "✅ Logged in!";
       hideSlideBar();
       document.querySelector(".FirebaseContainer").style.display = "none";
-      alert("✅ Logged in! welcome to FlickStream");
+      document.querySelector(".main-container").style.display="block";
+
     })
     .catch(error => {
       message.textContent = `❌ ${error.message}`;
@@ -73,6 +109,8 @@ onAuthStateChanged(auth, (user) => {
       emailSingIn.style.display = "none";
       passwordSingIn.style.display = "none";
       document.getElementById("userName").textContent = `User: ${user.email.split('@')[0]}`;
+      const firstlater = user.email.charAt(0).toUpperCase();
+      document.querySelector(".firstlater").innerHTML=firstlater;
       document.getElementById("signUpBtn").style.display = "none";
       document.querySelector(".FirebaseContainer").style.display = "none";
       document.querySelector("#logoutBtn").style.display = "block";
@@ -84,6 +122,7 @@ onAuthStateChanged(auth, (user) => {
       passwordSingIn.style.display = "block";
     }
   });
+ 
   
   window.hideLoginUI = function () {
     document.querySelector(".container").style.display = "none";
@@ -91,8 +130,195 @@ onAuthStateChanged(auth, (user) => {
   document.getElementById('signUpBtn').addEventListener('click', function () {
     const FirebaseContainer = document.querySelector(".FirebaseContainer");
     FirebaseContainer.style.display = "block";
+    document.querySelector(".main-container").style.display="none";
     hideSlideBar();
   }); 
+  
+  
+  
+  export async function addFavorite(movie) {
+    const user = auth.currentUser;
+    if (!user) return;
+  
+    const movieRef = doc(db, "users", user.uid, "favorites", movie.id.toString());
+    await setDoc(movieRef, movie); // store full movie object
+  }
+  
+  export async function removeFavorite(movieId) {
+    const user = auth.currentUser;
+    if (!user) return;
+  
+    const movieRef = doc(db, "users", user.uid, "favorites", movieId.toString());
+    await deleteDoc(movieRef);
+  }
+  
+  export async function checkIfFavorited(movieId) {
+    try {
+      const user = auth.currentUser;
+      if (!user) return false;
+  
+      const movieRef = doc(db, "users", user.uid, "favorites", movieId.toString());
+      const docSnap = await getDoc(movieRef);
+      return docSnap.exists();
+    } catch (err) {
+      console.error("Failed to fetch favorite status:", err.message);
+      return false;
+    }
+  }
+  
+
+  
+  async function getFavorites() {
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error("User not logged in");
+  
+      const favsCollection = collection(db, "users", user.uid, "favorites");
+      const favsSnapshot = await getDocs(favsCollection);
+  
+      const favorites = favsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      console.log("Favorites:", favorites);
+      return favorites;
+    } catch (error) {
+      console.error("Error fetching favorites:", error.message);
+      return [];
+    }
+  }
+  
+  
+  export async function addWatchList(movie) {
+    const user = auth.currentUser;
+    if (!user) return;
+  
+    const movieRef = doc(db, "users", user.uid, "WatchList", movie.id.toString());
+    await setDoc(movieRef, movie); // store full movie object
+  }
+  
+  export async function removeWatchList(movieId) {
+    const user = auth.currentUser;
+    if (!user) return;
+  
+    const movieRef = doc(db, "users", user.uid, "WatchList", movieId.toString());
+    await deleteDoc(movieRef);
+  }
+  
+  export async function checkIfWatchList(movieId) {
+    try {
+      const user = auth.currentUser;
+      if (!user) return false;
+  
+      const movieRef = doc(db, "users", user.uid, "WatchList", movieId.toString());
+      const docSnap = await getDoc(movieRef);
+      return docSnap.exists();
+    } catch (err) {
+      console.error("Failed to fetch WatchList status:", err.message);
+      return false;
+    }
+  }
+  
+
+  
+  async function getWatchList() {
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error("User not logged in");
+  
+      const WatchListCollection = collection(db, "users", user.uid, "WatchList");
+      const WatchListSnapshot = await getDocs(WatchListCollection);
+  
+      const WatchList = WatchListSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      console.log("WatchList:", WatchList);
+      return WatchList;
+    } catch (error) {
+      console.error("Error fetching WatchList:", error.message);
+      return [];
+    }
+  }
+
+  
+  
+  async function loadComments(movieId, container) {
+    container.innerHTML = ""; // clear previous comments
+  
+    const q = query(collection(db, "comments"), where("movieId", "==", movieId));
+    const querySnapshot = await getDocs(q);
+    if(querySnapshot==null || querySnapshot.empty){
+      const noComments = document.createElement("div");
+      noComments.textContent = "No comments yet. Be the first to comment!";
+      container.appendChild(noComments);
+      return;
+    }      
+      
+    querySnapshot.forEach(docSnap => {
+      const comment = docSnap.data();
+      const commentId = docSnap.id;
+  
+      const commentDiv = document.createElement("div");
+      commentDiv.style.marginBottom = "10px";
+      commentDiv.innerHTML = `
+    <strong>${comment.username.split('@')[0]}</strong> <small>${new Date(comment.timestamp?.toDate?.() || Date.now()).toLocaleString()}</small>
+        <p>${comment.text}</p>
+      `;
+  
+      // Check if current user is owner
+      const user = auth.currentUser;
+      if (user && user.uid === comment.uid) {
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Delete";
+        deleteBtn.style.marginLeft = "10px";
+        deleteBtn.style.cursor = "pointer";
+        deleteBtn.addEventListener("click", async () => {
+          await deleteComment(commentId, comment.uid);
+          loadComments(movieId, container); // Refresh comment list
+        });
+        commentDiv.appendChild(deleteBtn);
+      }
+  
+      container.appendChild(commentDiv);
+    });
+  }
+  
+  async function postComment(movieId, text, container, button, textarea) {
+    const user = auth.currentUser;
+    if (!user || !text.trim()) return;
+  
+  
+    try {
+      const commentsRef = collection(db, "comments");
+      await addDoc(commentsRef, {
+        movieId,
+        text: text.trim(),
+        timestamp: serverTimestamp(),
+        username: user.displayName || user.email,
+        uid: user.uid,
+      });
+  
+      loadComments(movieId, container); // Refresh comments
+  
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
+  }
+  
+  
+
+  
+  async function deleteComment(commentId, commentOwnerUid) {
+    const user = auth.currentUser;
+    if (!user) return;
+  
+    
+  
+    try {
+      const commentRef = doc(db, "comments", commentId);
+      await deleteDoc(commentRef);
+      console.log("Comment deleted.");
+      // Optionally update UI here
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
+  }
+  
 
   const container = document.getElementById("FirebaseContainer");
   const registerBtn = document.getElementById("register");
@@ -116,8 +342,9 @@ onAuthStateChanged(auth, (user) => {
   });
   document.querySelector(".closeFirebaseContainer").addEventListener("click", () => {
     document.querySelector(".FirebaseContainer").style.display = "none";
+    document.querySelector(".main-container").style.display="block";
+
   })
-  const form = document.querySelector("form");
   const mainContainer = document.querySelector(".main-container");
   const btnforSearch = document.querySelector(".btn-for-search");
   const moreDetailsContaner = document.querySelector(".more-details");
@@ -127,11 +354,11 @@ onAuthStateChanged(auth, (user) => {
   const searchIcon = document.getElementById("searchIcon");
   const sidebar =document.querySelector(".sidebar");
   
+  
   const API_KEY = 'd1becbefc947f6d6af137051548adf7f';
   const BASE_URL = 'https://api.themoviedb.org/3';
   let pageNumber = 1;
   let searchTime =1
-  let query;
   
   const themeToggleButton = document.getElementById('theme-toggle');
   
@@ -264,7 +491,8 @@ onAuthStateChanged(auth, (user) => {
             <h4 class="${ratingClass}"><i class="fa-solid fa-star"></i> ${ratingText}</h4>
             <h4>${item.title || item.name}</h4>
           `;
-  
+     
+          
           imgcart.appendChild(cartInfo);
           movieList.appendChild(imgcart);
   
@@ -290,6 +518,7 @@ onAuthStateChanged(auth, (user) => {
     item.addEventListener('click', () => {
       const category = item.getAttribute('data-category');
       loadCategory(category);
+      document.querySelector(".FirebaseContainer").style.display = "none";
     });
   });
   document.getElementById("loadMoreBtnforSlidebar").addEventListener("click", () => {
@@ -298,7 +527,7 @@ onAuthStateChanged(auth, (user) => {
   });
   
   
-  form.addEventListener('submit',(e)=>{
+  searchInput.addEventListener('submit',(e)=>{
       e.preventDefault();
       query=form.querySelector('input').value;
       searchTime=1;
@@ -341,14 +570,7 @@ onAuthStateChanged(auth, (user) => {
       ? `https://image.tmdb.org/t/p/w500/${item.poster_path}`
       : 'images/logo.png';
   
-   imgcart.innerHTML = `
-           <img 
-             src="images/lodar.webp"
-             data-src="${posterUrl}" 
-             class="movie-img lazy-load" 
-             loading="lazy"
-           >
-         `;
+   imgcart.innerHTML = ` <img src="${posterUrl}"> `;
     const cartInfo = document.createElement('div');
     cartInfo.classList.add("cartInfo");
   
@@ -377,7 +599,6 @@ onAuthStateChanged(auth, (user) => {
     `;
   
     imgcart.appendChild(cartInfo);
-    scheduleLazyLoad();
       imgcart.addEventListener("click", () => {
       moreDetails(type, item.id);
     });
@@ -522,18 +743,10 @@ onAuthStateChanged(auth, (user) => {
             ? (item.profile_path ? `https://image.tmdb.org/t/p/w500/${item.profile_path}` : 'images/castplaceholder.png')
             : (item.poster_path ? `https://image.tmdb.org/t/p/w500/${item.poster_path}` : 'images/castplaceholder.png');
   
-        imgcart.innerHTML = `
-          <img 
-            src="images/lodar.webp"
-            data-src="${imageUrl}" 
-            class="movie-img lazy-load" 
-            loading="lazy"
-          >
-        `;
-  
+            imgcart.innerHTML = ` <img src="${imageUrl}"> `;
+
         mainContainer.appendChild(SearchResult);
         SearchResult.appendChild(imgcart);
-        scheduleLazyLoad();
   
         const cartInfo = document.createElement('div');
         cartInfo.classList.add("cartInfo");
@@ -684,12 +897,58 @@ onAuthStateChanged(auth, (user) => {
       const content = document.createElement('div');
       content.className = 'details-content';
       content.innerHTML = `
-        <h2 class="movie-title">${data.name || data.title}</h2>
-        <p class="movie-release">Release: ${data.release_date || data.first_air_date || 'N/A'}</p>
-        <p class="movie-overview">${data.overview || 'No overview available.'}</p>`;
-      wrapper.appendChild(content);
-  
-      moreDetailsContaner.appendChild(wrapper);
+      <h2 class="movie-title">${data.name || data.title}</h2>
+      <div class="favorite-button-container" style="margin: 10px 0;">
+        <button id="favoriteBtn" class="favorite-btn">
+          <i class="fa-regular fa-heart"></i> Add to Favorites
+        </button>
+        <button id="WatchlistBtn" class="watchlist-btn">
+          <i class="fa-regular fa-bookmark"></i> Add to Watchlist
+        </button>
+      </div>
+      <p class="movie-release">Release: ${data.release_date || data.first_air_date || 'N/A'}</p>
+      <p class="movie-overview">${data.overview || 'No overview available.'}</p>
+    `;
+    wrapper.appendChild(content);
+    moreDetailsContaner.appendChild(wrapper);
+    
+    // Favorite Button Logic
+    const favoriteBtn = document.getElementById("favoriteBtn");
+    const isFav = await checkIfFavorited(data.id);
+    if (isFav) {
+      favoriteBtn.innerHTML = '<i class="fa-solid fa-heart"></i> Remove from Favorites';
+    }
+    favoriteBtn.addEventListener("click", async () => {
+      favoriteBtn.innerHTML = '<i class="fa-solid fa-heart"></i> Loading...';
+      const currentlyFav = await checkIfFavorited(data.id);
+      if (currentlyFav) {
+        await removeFavorite(data.id);
+        favoriteBtn.innerHTML = '<i class="fa-regular fa-heart"></i> Add to Favorites';
+      } else {
+        await addFavorite(data);
+        favoriteBtn.innerHTML = '<i class="fa-solid fa-heart"></i> Remove from Favorites ';
+      }
+    });
+    
+    // Watchlist Button Logic
+    const WatchlistBtn = document.getElementById("WatchlistBtn");
+    const isWatchlist = await checkIfWatchList(data.id);
+    if (isWatchlist) {
+      WatchlistBtn.innerHTML = '<i class="fa-solid fa-bookmark"></i> Remove from Watchlist';
+    }
+    WatchlistBtn.addEventListener("click", async () => {
+      WatchlistBtn.innerHTML = '<i class="fa-solid fa-bookmark"></i> Loading...';
+      const currentlyInWatchlist = await checkIfWatchList(data.id);
+      if (currentlyInWatchlist) {
+        await removeWatchList(data.id);
+        WatchlistBtn.innerHTML = '<i class="fa-regular fa-bookmark"></i> Add to Watchlist';
+      } else {
+        await addWatchList(data);
+        WatchlistBtn.innerHTML = '<i class="fa-solid fa-bookmark"></i>Remove from Watchlist ';
+      }
+    });
+    
+
       moreDetailsContaner.style.transform = "scale(1)";
       mainContainer.style.display = "none";
   
@@ -713,7 +972,7 @@ onAuthStateChanged(auth, (user) => {
             <img src="${actor.profile_path ? 'https://image.tmdb.org/t/p/w185' + actor.profile_path : 'images/castplaceholder.png'}" alt="${actor.name}">
             <p><i>${actor.name}</i></p>
             <p>${actor.character}</p>`;
-  
+     
           actorCard.addEventListener("click", () => {
             fetchPersonDetails(actor.id, actor);
           });
@@ -752,7 +1011,7 @@ onAuthStateChanged(auth, (user) => {
   
         moreDetailsContaner.appendChild(seasonTabs);
         moreDetailsContaner.appendChild(episodeContainer);
-  
+
         const latestSeason = seasons[seasons.length - 1];
         await loadSeason(latestSeason.season_number);
   
@@ -805,7 +1064,8 @@ onAuthStateChanged(auth, (user) => {
           }
         }
       }
-  
+      renderCommentSection(moreDetailsContaner, data.id); // Use TMDB movie/TV show ID
+ 
       // Fetch related movies/shows
       if (data.seasons !== undefined) {
         fetchRelatedMovies(data.id, "tv");
@@ -942,14 +1202,7 @@ onAuthStateChanged(auth, (user) => {
             ? `https://image.tmdb.org/t/p/w500/${movie.poster_path}`
             : 'images/logo.png';
   
-          movieCard.innerHTML = `
-            <img 
-              src="images/lodar.webp"
-              data-src="${posterUrl}" 
-              class="movie-img lazy-load" 
-              loading="lazy"
-            >
-          `;
+          movieCard.innerHTML = `<img  src="${posterUrl}">`;
   
           const cartInfo = document.createElement('div');
           cartInfo.classList.add("cartInfo");
@@ -990,66 +1243,10 @@ onAuthStateChanged(auth, (user) => {
         });
   
         moreDetailsContaner.appendChild(relatedContainer);
-        scheduleLazyLoad(); // call once after all cards are added
       });
   }
   
-  
-  let lazyTimer;
-  function scheduleLazyLoad() {
-    clearTimeout(lazyTimer);
-    lazyTimer = setTimeout(replaceLazyImages, 100);
-  }
-   // lazay 
-   function replaceLazyImages() {
-    const lazyImages = document.querySelectorAll('img.lazy-load');
-  
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver((entries, observerRef) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const img = entry.target;
-            const realSrc = img.getAttribute('data-src');
-  
-            const tempImg = new Image();
-            tempImg.src = realSrc;
-  
-            tempImg.onload = () => {
-              img.src = realSrc;
-              img.classList.add('loaded');
-              img.removeAttribute('data-src');
-            };
-  
-            observerRef.unobserve(img);
-          }
-        });
-      }, {
-        rootMargin: "0px 0px 200px 0px", 
-        threshold: 0.01
-      });
-  
-      lazyImages.forEach(img => {
-        observer.observe(img);
-      });
-  
-    } else {
-      lazyImages.forEach(img => {
-        const realSrc = img.getAttribute('data-src');
-        const tempImg = new Image();
-        tempImg.src = realSrc;
-  
-        tempImg.onload = () => {
-          img.src = realSrc;
-          img.classList.add('loaded');
-          img.removeAttribute('data-src');
-        };
-      });
-    }
-  }
-  let debounceTimeout;
-  
-  // Get dropdown
-  const searchTypeSelect = document.getElementById("searchType");
+
   
   // Handle Enter key: hide suggestions
   searchInput.addEventListener("keydown", (event) => {
@@ -1068,7 +1265,8 @@ onAuthStateChanged(auth, (user) => {
       searchInput.focus();
     }
   });
-  
+  let debounceTimeout;
+  const searchTypeSelect = document.getElementById("searchType");
   // Handle input for suggestions and icon toggle
   searchInput.addEventListener("input", () => {
     clearTimeout(debounceTimeout);
@@ -1083,7 +1281,6 @@ onAuthStateChanged(auth, (user) => {
       suggestionsBox.classList.remove("Active");
       return;
     }
-  
     debounceTimeout = setTimeout(async () => {
       let endpoint = selectedType;
   
@@ -1183,4 +1380,189 @@ onAuthStateChanged(auth, (user) => {
       
   }
   
+  async function showFavorites() {
+  const favoriteDiv = document.querySelector(".favoriteDiv");
+  const favList = document.getElementById("favorite-list");
+  favoriteDiv.style.display="block";
+
+  favList.innerHTML = "Loading...";
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '&times;';
+  closeBtn.className = 'close-btn-favorites';
+  closeBtn.addEventListener('click', () => {  
+    mainContainer.style.display = "block";
+    favList.innerHTML = '';
+    favoriteDiv.style.display = "none";
+  });
+  favoriteDiv.appendChild(closeBtn);
+
+  const favorites = await getFavorites();
+  if (favorites.length === 0) {
+    favList.innerHTML = "No favorites yet. please log in and add some.";
+    return;
+  }
+
+  favList.innerHTML = "";
+ 
+
   
+  favorites.forEach(fav => {
+    const imgcart = document.createElement("div");
+    imgcart.classList.add("imgcart");
+
+    const posterUrl = fav.poster_path
+    ? `https://image.tmdb.org/t/p/w500${fav.poster_path}`
+    : 'images/logo.png';
+    
+    imgcart.innerHTML = `<img src="${posterUrl}">`;
+    
+     let ratingClass = '';
+     let ratingText = '';
+    if (!fav.vote_average || fav.vote_average === 0) {
+      ratingClass = 'rating-no';
+      ratingText = 'N/A';
+    } else if (fav.vote_average >= 7) {
+       ratingClass = 'rating-high';
+      ratingText = fav.vote_average.toFixed(1);
+    } else if (fav.vote_average >= 5) {
+     ratingClass = 'rating-mid';
+     ratingText = fav.vote_average.toFixed(1);
+    } else {
+     ratingClass = 'rating-low';
+     ratingText = fav.vote_average.toFixed(1);
+    }
+    const cartInfo = document.createElement('div');
+    cartInfo.classList.add("cartInfo");
+    cartInfo.innerHTML = `
+      <h4 class="${ratingClass}"><i class="fa-solid fa-star"></i> ${ratingText}</h4>
+      <h4>${fav.title || fav.name}</h4>
+    `;
+     imgcart.appendChild(cartInfo);
+    favList.appendChild(imgcart);
+    imgcart.addEventListener("click", () => {
+      if (fav.seasons !== undefined) {
+        moreDetails("tv", fav.id);
+      } else {
+        moreDetails("movie", fav.id);
+      }
+    });
+  });
+
+
+
+}
+document.getElementById("getFavorite").addEventListener("click", () => {
+  showFavorites();
+  hideSlideBar();
+  mainContainer.style.display = "none";
+  document.querySelector(".favoriteDiv").style.display="block";
+  const watchlistDiv = document.querySelector(".watchlistDiv");
+  watchlistDiv.style.display="none";
+  moreDetailsContaner.style.transform = "scale(0)";
+
+});
+async function showWatchlist() {
+  const watchlistDiv = document.querySelector(".watchlistDiv");
+  const watchlistList = document.getElementById("watchlist-list");
+  watchlistDiv.style.display="block";
+
+  watchlistList.innerHTML = "Loading...";
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '&times;';
+  closeBtn.className = 'close-btn-favorites';
+  closeBtn.addEventListener('click', () => {  
+    mainContainer.style.display = "block";
+    watchlistList.innerHTML = '';
+    watchlistDiv.style.display = "none";
+  });
+  watchlistDiv.appendChild(closeBtn);
+
+  const WatchList = await getWatchList();
+  if (WatchList.length === 0) {
+    watchlistList.innerHTML = "No Watchlist yet. please log in and add some.";
+    return;
+  }
+
+  watchlistList.innerHTML = ""; 
+  WatchList .forEach(wat => {
+    const imgcart = document.createElement("div");
+    imgcart.classList.add("imgcart");
+
+    const posterUrl = wat.poster_path
+    ? `https://image.tmdb.org/t/p/w500${wat.poster_path}`
+    : 'images/logo.png';
+    
+    imgcart.innerHTML = `<img src="${posterUrl}">`;
+    
+     let ratingClass = '';
+     let ratingText = '';
+    if (!wat.vote_average || wat.vote_average === 0) {
+      ratingClass = 'rating-no';
+      ratingText = 'N/A';
+    } else if (wat.vote_average >= 7) {
+       ratingClass = 'rating-high';
+      ratingText = wat.vote_average.toFixed(1);
+    } else if (wat.vote_average >= 5) {
+     ratingClass = 'rating-mid';
+     ratingText = wat.vote_average.toFixed(1);
+    } else {
+     ratingClass = 'rating-low';
+     ratingText = wat.vote_average.toFixed(1);
+    }
+    const cartInfo = document.createElement('div');
+    cartInfo.classList.add("cartInfo");
+    cartInfo.innerHTML = `
+      <h4 class="${ratingClass}"><i class="fa-solid fa-star"></i> ${ratingText}</h4>
+      <h4>${wat.title || wat.name}</h4>
+      
+    `;
+     imgcart.appendChild(cartInfo);
+    watchlistList.appendChild(imgcart);
+    imgcart.addEventListener("click", () => {
+      if (wat.seasons !== undefined) {
+        moreDetails("tv", wat.id);
+      } else {
+        moreDetails("movie", wat.id);
+      }
+    });
+  });
+
+
+
+}
+document.getElementById("getWatchlist").addEventListener("click", () => {
+  showWatchlist();
+  hideSlideBar();
+  mainContainer.style.display = "none";
+  document.querySelector(".watchlistDiv").style.display="block";
+  const favoriteDiv = document.querySelector(".favoriteDiv");
+  favoriteDiv.style.display="none";
+  moreDetailsContaner.style.transform = "scale(0)";
+
+});
+function renderCommentSection(main, movieId) {
+  const commentWrapper = document.createElement("div");
+  commentWrapper.className = "comment-section";
+  commentWrapper.style.margin = "20px 0";
+  commentWrapper.innerHTML = `
+    <h3>Comments</h3>
+    <textarea class="comment-box" placeholder="Write a comment..." style="width:100%;height:80px;"></textarea>
+    <button class="post-comment">Post</button>
+    <div class="comments-list" style="margin-top:10px;"></div>
+  `;
+
+  main.appendChild(commentWrapper);
+
+  const textarea = commentWrapper.querySelector(".comment-box");
+  const postBtn = commentWrapper.querySelector(".post-comment");
+  const commentsList = commentWrapper.querySelector(".comments-list");
+
+  // Load and display comments
+  loadComments(movieId, commentsList);
+
+  // Handle posting comment
+  postBtn.addEventListener("click", () => {
+    postComment(movieId, textarea.value, commentsList);
+    textarea.value = "";
+  });
+}

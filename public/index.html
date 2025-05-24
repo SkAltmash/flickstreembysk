@@ -1,89 +1,148 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flick Stream </title>
+  <link rel="icon" type="image/x-icon" href="/images/logo.png">
+  <link rel="stylesheet" href="style.css">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+     <div class="FirebaseContainer" id="FirebaseContainer">
+      <button class="closeFirebaseContainer">x</button>
+      <p id="message"></p>
 
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/11.8.1/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/11.8.1/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/11.8.1/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/11.8.1/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/11.8.1/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/11.8.1/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/11.8.1/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/11.8.1/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/11.8.1/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/11.8.1/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+      <div class="form-container sign-up">
+        <form class="signUpFrom">
+          <h1>Create Account</h1>
+          <input type="text" placeholder="Name" />
+          <input type="email" id="emailSingUp" placeholder="Email" />
+          <input type="password" id="passwordSingUp" placeholder="Password" />
+          <input type="password" id="passkey" placeholder="Passkey">
+          <button onclick="signUp()">Sign Up</button>
+        </form>
+      </div>
+      <div class="form-container sign-in">
+        <form class="signInFrom">
+          <h1>Sign In</h1>
+          <input type="email" id="emailSingIn"placeholder="Email" />
+          <input type="password"id="passwordSingIn" placeholder="Password" />
+          <button onclick="logIn()"> Sign In</button>
+        </form>
+      </div>
+      <div class="toggle-container">
+        <div class="toggle">
+          <div class="toggle-panel toggle-left">
+            <h1>Welcome Back!</h1>
+            <p>Enter your personal details to use all of site features</p>
+            <button  id="login">Sign In</button>
+          </div>
+          <div class="toggle-panel toggle-right">
+            <h1>let's Make Fun Together</h1>
+            <p>
+              Register with your personal details to use all of site features
+            </p>
+            <button id="register">Sign Up</button>
+          </div>
+        </div>
+      </div>
 
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
     </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
+  <nav>
+    <div id="sidebarTriggerOpen" ><i class="fa-solid fa-bars"></i></div>
+    <div class="logo">
+      <h4>FlickStream</h4> 
+    </div>
+</nav>
+<div id="sidebar" class="sidebar">
+  <div>
+    <button id="theme-toggle"><i class="fa-solid fa-sun"></i></button>
+    <button id="sidebarTriggerClose"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="userInformation">
+    <div class="userImg"><h1 class="firstlater">f</h1></div>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+    <div class="userName">
+      <h4 id="userName">FlickStream User</h4>
+    </div>
+    <div class="sigupDiv">
+      <button id="signUpBtn">login</button>
+      <button id="logoutBtn" onclick="logOut()">Log Out</button>
+      </div>
+  
+  </div>
+   <h3 id="getFavorite"><i class="fa-solid fa-heart"></i> My favorite</h3> 
+   <h3 id="getWatchlist"><i class="fa-solid fa-bookmark"></i> My Watchlist</h3> 
 
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
-        }
-      });
-    </script>
-  </body>
+  <ul>
+    <li data-category="latest">Latest Movies</li>
+    <li data-category="hollywood">Latest Hollywood</li>
+    <li data-category="bollywood">Latest Bollywood</li>
+    <li data-category="series">Latest Web Series</li>
+    <li data-category="NetflixMovies">Movies Trending on Netflix</li>
+    <li data-category="Netflixseries">Series Trending on Netflix</li>  
+   </ul>
+</div>
+
+<!-- Main content -->
+<div id="Slidebar-content">
+  <h2 class="labl"></h2>
+  <div id="movieList"></div>
+
+<div class="bt-Contner"> <buton id="loadMoreBtnforSlidebar" class="load-more-btn" style="display:none;">Load More</button>
+</div>      
+</div>
+
+<form id="searchForm">
+  <div>
+    <select id="searchType">
+      <option value="multi">All</option>
+      <option value="movie">Movies</option>
+      <option value="tv">TV Shows</option>
+      <option value="person">Cast</option>
+      </select>
+    <input type="text" id="searchInput" class="searchInput" placeholder="Search here..." />
+    <h3 type="submit" id="searchBtn">
+      <i id="searchIcon" class="fa-solid fa-magnifying-glass"></i>
+    </h3>
+  </div>
+  <div id="suggestions" class="suggestions-box"></div>
+</form>
+ <div class="favoriteDiv">
+  <h2 class="section-title">favorite</h2>
+  <div id="favorite-list"></div>
+ </div>
+ <div class="watchlistDiv">
+  <h2 class="section-title">Watch List</h2>
+  <div id="watchlist-list"></div>
+</div>
+<section class="section-main-contaner">
+<div class="main-container">
+</div>
+ <div class="load-more-wrapper btn-for-search">
+    <button id="loadMoreBtn" class="load-more-btn" onclick="loadMoreREsultSearch()">
+      <span class="btn-text">Load More</span>
+      <span class="spinner hidden"></span>
+    </button>
+ </div>
+</section>
+<div class="more-details"></div>
+<div class="personDetails"></div>
+<footer class="main-footer">
+    <div class="footer-content">
+      <p>&copy; 2025 FlickStream. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="mailto:skaltmask3@gmail.com">Contact Us</a>
+    </div>
+    </div>
+  </footer>
+
+</body>
+<script type="module" src="app.js"></script>
+
 </html>
