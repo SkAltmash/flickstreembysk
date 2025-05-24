@@ -1,8 +1,20 @@
 {
-  "scripts": {
-    "build": "echo 'Add your build commands here, e.g., react-scripts build or next build'"
+  "id": 42834921136,
+  "repoId": 988489587,
+  "repoName": "flickstreembysk",
+  "repoOwner": "SkAltmash",
+  "contents": "2025-05-24T17:00:25.1687701Z ##[group]Run npm run build\n2025-05-24T17:00:25.1688433Z \u001b[36;1mnpm run build\u001b[0m\n2025-05-24T17:00:25.1853324Z shell: /usr/bin/bash -e ***0***\n2025-05-24T17:00:25.1853980Z ##[endgroup]\n2025-05-24T17:00:25.4440963Z npm error Missing script: \"build\"\n2025-05-24T17:00:25.4442133Z npm error\n2025-05-24T17:00:25.4442923Z npm error To see a list of scripts, run:\n--- ERROR ---\n2025-05-24T17:00:25.4443756Z npm error   npm run\n2025-05-24T17:00:25.4466519Z npm error A complete log of this run can be found in: /home/runner/.npm/_logs/2025-05-24T17_00_25_327Z-debug-0.log\n2025-05-24T17:00:25.4529240Z ##[error]Process completed with exit code 1.",
+  "ref": "e46ba4c01ca5cc8da90a034204e88fdf75f49bfb",
+  "runner": {
+    "id": 0,
+    "name": "",
+    "groupID": 0,
+    "groupName": ""
   },
-  "dependencies": {
-    "firebase": "^11.8.1"
-  }
+  "workflow": {
+    "id": 163647372,
+    "name": "Deploy to Firebase Hosting on merge",
+    "filePath": ".github/workflows/firebase-hosting-merge.yml"
+  },
+  "type": "job"
 }
