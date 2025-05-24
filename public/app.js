@@ -425,15 +425,15 @@ onAuthStateChanged(auth, (user) => {
     currentPage = page;
   
     if (type === "latest") {
-      url = `https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}&language=en-US&page=${page}`;
+      url = `/.netlify/functions/tmdb?path=movie/now_playing&query=language=en-US&page=${page}`;
       mediaType = "movie";
       labl.innerText=`Latest Movies`;
       } else if (type === "hollywood") {
-      url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=en&page=${page}`;
-      mediaType = "movie";  
+      url = `/.netlify/functions/tmdb?path=discover/movie&query=with_original_language=en&page=${page}`;
+       mediaType = "movie";  
       labl.innerText=`Latest Hollywood`;
       } else if (type === "bollywood") {
-      url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=hi&page=${page}`;
+     url = `/.netlify/functions/tmdb?path=discover/movie&query=with_original_language=hi&page=${page}`;     
       mediaType = "movie";
       labl.innerText=`Latest Bollywood`;
       } else if (type === "series") {
@@ -441,12 +441,12 @@ onAuthStateChanged(auth, (user) => {
       mediaType = "tv";
       labl.innerText=`Latest Web Series`;
       }else if(type==="NetflixMovies"){
-      url= `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&sort_by=popularity.desc&page=${page}&with_networks=213`;
-      mediaType = "movie";
+       url = `/.netlify/functions/tmdb?path=discover/tv&query=language=en-US&sort_by=popularity.desc&page=${page}`;
+        mediaType = "movie";
       labl.innerText=`Movies Trending on Netflix`;
       }
       else if(type==="Netflixseries"){
-        url= `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&sort_by=popularity.desc&page=${page}&with_networks=213`;
+       url = `/.netlify/functions/tmdb?path=discover/tv&query=sort_by=popularity.desc&page=${page}&with_networks=213`;
         mediaType = "tv";
         labl.innerText=`Series Trending on Netflix `;
       }
@@ -608,7 +608,7 @@ onAuthStateChanged(auth, (user) => {
   
   async function getLatestMovies() {
     try {
-      const response = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&sort_by=popularity.desc`);
+      const response = await fetch(`/.netlify/functions/tmdb?path=discover/movie&query=sort_by=popularity.desc`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
   
       const data = await response.json();
@@ -627,7 +627,7 @@ onAuthStateChanged(auth, (user) => {
   
   async function getLatestShow() {
     try {
-      const response = await fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&sort_by=popularity.desc`);
+      const response = await fetch(`/.netlify/functions/tmdb?path=discover/tv&query=sort_by=popularity.desc`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
   
       const data = await response.json();
@@ -646,7 +646,7 @@ onAuthStateChanged(auth, (user) => {
   
   async function getLatestShowNetflix() {
     try {
-      const response = await fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&sort_by=popularity.desc&with_networks=213`);
+   const response = await fetch(`/.netlify/functions/tmdb?path=discover/tv&query=sort_by=popularity.desc&with_networks=213`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
   
       const data = await response.json();
@@ -665,7 +665,7 @@ onAuthStateChanged(auth, (user) => {
   
   async function getLatestShowAmazon() {
     try {
-      const response = await fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&sort_by=popularity.desc&with_networks=1024`);
+      const response = await fetch(`/.netlify/functions/tmdb?path=discover/tv&query=sort_by=popularity.desc&with_networks=1024`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
   
       const data = await response.json();
@@ -684,7 +684,7 @@ onAuthStateChanged(auth, (user) => {
   
   async function getLatestShowHotstar() {
     try {
-      const response = await fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&sort_by=popularity.desc&with_networks=3919`);
+      const response = await fetch(`/.netlify/functions/tmdb?path=discover/tv&query=sort_by=popularity.desc&with_networks=3919`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
   
       const data = await response.json();
@@ -715,7 +715,7 @@ onAuthStateChanged(auth, (user) => {
     let endpoint = selectedType;
    
   
-    const url = `https://api.themoviedb.org/3/search/${endpoint}?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=en-US&page=${pageNumber}&include_adult=false`;
+    const url = `/.netlify/functions/tmdb?path=search/${endpoint}&query=query=${encodeURIComponent(query)}&language=en-US&page=${pageNumber}&include_adult=false`;
   
     try {
       const response = await fetch(url);
@@ -842,8 +842,8 @@ onAuthStateChanged(auth, (user) => {
       await new Promise(res => setTimeout(res, 50));
     
   
-        const detailRes = await fetch(`https://api.themoviedb.org/3/${category}/${id}?api_key=${API_KEY}`);
-        const data = await detailRes.json();
+      const detailRes = await fetch(`/.netlify/functions/tmdb?path=${category}/${id}`);
+      const data = await detailRes.json();
   
   
       const posterSize = window.innerWidth <= 580 ? 'w300' : 'w780';
@@ -867,7 +867,7 @@ onAuthStateChanged(auth, (user) => {
       moreDetailsContaner.appendChild(closeBtn);
   
       // Fetch trailer
-      const videoRes = await fetch(`https://api.themoviedb.org/3/${category}/${id}/videos?api_key=${API_KEY}`);
+      const videoRes = await fetch(`/.netlify/functions/tmdb?path=${category}/${id}/videos`);
       const videoData = await videoRes.json();
       const youtubeTrailer = videoData.results.find(vid => vid.site === 'YouTube' && vid.type === 'Trailer');
   
@@ -953,7 +953,7 @@ onAuthStateChanged(auth, (user) => {
       mainContainer.style.display = "none";
   
       // Fetch cast
-      const castRes = await fetch(`https://api.themoviedb.org/3/${category}/${id}/credits?api_key=${API_KEY}`);
+      const castRes = await fetch(`/.netlify/functions/tmdb?path=${category}/${id}/credits`);
       const castData = await castRes.json();
   
       const castSection = document.createElement('div');
@@ -1016,7 +1016,7 @@ onAuthStateChanged(auth, (user) => {
         await loadSeason(latestSeason.season_number);
   
         async function loadSeason(seasonNumber) {
-          const seasonRes = await fetch(`https://api.themoviedb.org/3/tv/${id}/season/${seasonNumber}?api_key=${API_KEY}`);
+          const seasonRes = await fetch(`/.netlify/functions/tmdb?path=tv/${id}/season/${seasonNumber}`);
           const seasonData = await seasonRes.json();
   
           episodeContainer.innerHTML = `
@@ -1099,13 +1099,13 @@ onAuthStateChanged(auth, (user) => {
     moreDetailsContaner.style.transform = "scale(0)";
   
     // First: Fetch biography
-    fetch(`https://api.themoviedb.org/3/person/${personId}?api_key=${API_KEY}`)
-      .then(res => res.json())
+    fetch(`/.netlify/functions/tmdb?path=person/${personId}`)
+    .then(res => res.json())
       .then(actorDetails => {
         const bio = shortenBio(actorDetails.biography);
         // Second: Fetch recent credits
-        fetch(`https://api.themoviedb.org/3/person/${personId}/combined_credits?api_key=${API_KEY}`)
-          .then(res => res.json())
+        fetch(`/.netlify/functions/tmdb?path=person/${personId}/combined_credits`)
+        .then(res => res.json())
           .then(data => {
   
             const personDetails = document.querySelector(".personDetails");
@@ -1178,7 +1178,7 @@ onAuthStateChanged(auth, (user) => {
       ? `movie/${movieId}/similar`
       : `tv/${movieId}/similar`;
   
-    fetch(`https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}`)
+      fetch(`/.netlify/functions/tmdb?path=${endpoint}`)
       .then(res => res.json())
       .then(data => {
         const relatedContainer = document.createElement('div');
@@ -1287,9 +1287,8 @@ onAuthStateChanged(auth, (user) => {
     
   
       try {
-        const response = await fetch(
-          `https://api.themoviedb.org/3/search/${endpoint}?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=en-US&page=1&include_adult=false`
-        );
+        const response = await fetch(`/.netlify/functions/tmdb?path=search/${endpoint}&query=query=${encodeURIComponent(query)}&language=en-US&page=1&include_adult=false`);
+
         const data = await response.json();
   
         let results = data.results || [];
