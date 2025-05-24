@@ -1,7 +1,7 @@
-const fetch = require('node-fetch');
+// netlify/functions/tmdb.js
 
 exports.handler = async function(event) {
-  const API_KEY = 'd1becbefc947f6d6af137051548adf7f';  // Your TMDB API key
+  const API_KEY = 'd1becbefc947f6d6af137051548adf7f'; // Your TMDB API key
 
   const path = event.queryStringParameters?.path || '';
   const query = event.queryStringParameters?.query || '';
@@ -16,7 +16,7 @@ exports.handler = async function(event) {
   const url = `https://api.themoviedb.org/3/${path}?api_key=${API_KEY}&${query}`;
 
   try {
-    const res = await fetch(url);
+    const res = await fetch(url); // ✅ Native fetch (no require)
     if (!res.ok) {
       return {
         statusCode: res.status,
@@ -25,11 +25,12 @@ exports.handler = async function(event) {
     }
 
     const data = await res.json();
+
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',  // Allow CORS
+        'Access-Control-Allow-Origin': '*', // ✅ Allow CORS
       },
       body: JSON.stringify(data),
     };
