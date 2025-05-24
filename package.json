@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "build": "echo 'Add your build commands here, e.g., react-scripts build or next build'"
+  },
   "dependencies": {
     "firebase": "^11.8.1"
   }
