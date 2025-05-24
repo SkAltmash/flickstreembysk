@@ -1,5 +1,5 @@
- const fetch = require('node-fetch');
-    
+const fetch = require('node-fetch');
+
 exports.handler = async function(event) {
   const API_KEY = 'd1becbefc947f6d6af137051548adf7f';  // Your TMDB API key
 
@@ -23,6 +23,7 @@ exports.handler = async function(event) {
         body: JSON.stringify({ error: `TMDB API responded with status ${res.status}` }),
       };
     }
+
     const data = await res.json();
     return {
       statusCode: 200,
