@@ -1,10 +1,7 @@
 [build]
   functions = "netlify/functions"
-<<<<<<< HEAD
 
-=======
   # no build command, remove or leave blank
->>>>>>> adef107 (Initial commit with Netlify function and setup)
 
 [functions]
   node_bundler = "esbuild"
