@@ -61,7 +61,7 @@ button{
   width: 100vw;
   min-height: 100vh;
   position: fixed;
-  z-index: 11;
+  z-index: 14;
   display: none;
 }
 #message{
@@ -315,7 +315,7 @@ button{
     padding: 10px;
     cursor: pointer;
     border-top: 1px solid var(--card-hover-bg);
-    color: var(--secondary-color);
+    color: var(--text-color);
   }
   #getFavorite:hover {
     background-color: var(--card-hover-bg);
@@ -324,7 +324,7 @@ button{
     padding: 10px;
     cursor: pointer;
     border-top: 1px solid var(--card-hover-bg);
-    color: var(--secondary-color);
+    color: var(--text-color);
   }
   #getWatchlist:hover {
     background-color: var(--card-hover-bg);
@@ -773,6 +773,8 @@ button{
   padding: 10px;
   font-size: 1rem;
   border: 1px solid #ccc;
+  color: var(--text-color);
+  background-color:var(--background-color) ;
   border-radius: 6px;
   resize: vertical;
 }
@@ -1180,7 +1182,11 @@ button{
     gap:15pxx;
    }
    
-  
+  .no-resultsh3 {
+    color: var(--text-color);
+    text-align: center;
+    width: 100%; ;
+  }
    .imgcart ,.movieCard{
     height: 320px;
     width: 150px;
@@ -1206,7 +1212,7 @@ button{
       flex-direction: column;
      }
      .more-details,.personDetails{
-      top: 50px;
+      top: 70px;
       padding-left: 10px;
       padding-right: 10px;
      }

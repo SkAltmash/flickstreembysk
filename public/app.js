@@ -414,32 +414,31 @@ onAuthStateChanged(auth, (user) => {
     hideSlideBar();
   });
   let currentType;
-  let currentPage;
-  function loadCategory(type, page = 1) {
+  let page =1;
+  function loadCategory(type, page) {
     let url = "";
     let mediaType = "";
     const labl = document.querySelector(".labl")
    
     document.querySelector(".label")
     currentType = type;
-    currentPage = page;
   
     if (type === "latest") {
       url = `/.netlify/functions/tmdb?path=movie/now_playing&query=language=en-US&page=${page}`;
       mediaType = "movie";
       labl.innerText=`Latest Movies`;
       } else if (type === "hollywood") {
-      url = `/.netlify/functions/tmdb?path=discover/movie&query=with_original_language=en&page=${page}`;
-       mediaType = "movie";  
+        url = `/.netlify/functions/tmdb?path=discover/movie&query=with_original_language=en&sort_by=release_date.asc&page=${page}`;
+        mediaType = "movie";  
       labl.innerText=`Latest Hollywood`;
       } else if (type === "bollywood") {
-     url = `/.netlify/functions/tmdb?path=discover/movie&query=with_original_language=hi&page=${page}`;     
+        url = `/.netlify/functions/tmdb?path=discover/movie&query=with_original_language=hi&sort_by=release_date.asc&page=${page}`;
       mediaType = "movie";
       labl.innerText=`Latest Bollywood`;
       } else if (type === "series") {
-      url = `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&page=${page}`;
+        url = `/.netlify/functions/tmdb?path=discover/tv&query=with_original_language=hi&sort_by=release_date.asc&page=${page}`;
       mediaType = "tv";
-      labl.innerText=`Latest Web Series`;
+      labl.innerText=`Latest Web Series hindi`;
       }else if(type==="NetflixMovies"){
        url = `/.netlify/functions/tmdb?path=discover/tv&query=language=en-US&sort_by=popularity.desc&page=${page}`;
         mediaType = "movie";
@@ -522,8 +521,9 @@ onAuthStateChanged(auth, (user) => {
     });
   });
   document.getElementById("loadMoreBtnforSlidebar").addEventListener("click", () => {
-    currentPage++;
-    loadCategory(currentType,currentPage);
+
+    loadCategory(currentType,++page);
+    console.log(page);
   });
   
   
@@ -646,7 +646,7 @@ onAuthStateChanged(auth, (user) => {
   
   async function getLatestShowNetflix() {
     try {
-   const response = await fetch(`/.netlify/functions/tmdb?path=discover/tv&query=sort_by=popularity.desc&with_networks=213`);
+      const response = await fetch(`/.netlify/functions/tmdb?path=discover/tv&query=with_networks=213&sort_by=popularity.desc`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
   
       const data = await response.json();
@@ -665,7 +665,7 @@ onAuthStateChanged(auth, (user) => {
   
   async function getLatestShowAmazon() {
     try {
-      const response = await fetch(`/.netlify/functions/tmdb?path=discover/tv&query=sort_by=popularity.desc&with_networks=1024`);
+      const response = await fetch(`/.netlify/functions/tmdb?path=discover/tv&query=with_networks=1024&sort_by=popularity.desc`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
   
       const data = await response.json();
@@ -684,7 +684,7 @@ onAuthStateChanged(auth, (user) => {
   
   async function getLatestShowHotstar() {
     try {
-      const response = await fetch(`/.netlify/functions/tmdb?path=discover/tv&query=sort_by=popularity.desc&with_networks=3919`);
+      const response = await fetch(`/.netlify/functions/tmdb?path=discover/tv&query=with_networks=3919&sort_by=popularity.desc`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
   
       const data = await response.json();
@@ -729,12 +729,25 @@ onAuthStateChanged(auth, (user) => {
   
       const data = await response.json();
       let results = data.results;
-  
+      if(data.total_results === 0) {
+        const noResults = document.createElement('div');
+        noResults.classList.add("no-results");
+        noResults.innerHTML = `<h3>No results found for "${query}"</h3>`;
+        noResults.style.textAlign = "center";
+        noResults.style.marginTop = "20px";
+        noResults.style.color = "#888";
+        noResults.style.fontSize = "1.2em";
+        noResults.style.fontWeight = "bold";
+        noResults.style.padding = "20px";
+
+        mainContainer.appendChild(noResults);
+        return;
+      }
     
       results.forEach(item => {
         const mediaType = item.media_type || selectedType;
         if (mediaType !== "movie" && mediaType !== "tv" && mediaType !== "person") return;
-  
+       
         const imgcart = document.createElement('div');
         imgcart.classList.add("imgcart");
   
@@ -822,7 +835,6 @@ onAuthStateChanged(auth, (user) => {
    loadMoreBtn.addEventListener('click', async () => {
      btnText.textContent = "Loading...";
      spinner.classList.remove('hidden');
-   
      // Simulate async content loading
    
      btnText.textContent = "Load More";
